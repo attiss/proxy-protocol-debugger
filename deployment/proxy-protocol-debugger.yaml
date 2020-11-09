@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-protocol-debugger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy-protocol-debugger
+  template:
+    metadata:
+      labels:
+        app: proxy-protocol-debugger
+    spec:
+      containers:
+        - name: proxy-protocol-debugger
+          image: us.icr.io/attila-fabian/proxy-protocol-debugger:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxy-protocol-debugger
+  annotations:
+    service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: "proxy-protocol"
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: proxy-protocol-debugger

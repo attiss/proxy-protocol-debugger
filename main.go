@@ -38,6 +38,7 @@ func main() {
 			logger.Error("failed to retrieve remote address")
 		} else {
 			logger.Info("successfully retrieved remote address", zap.String("remote", remoteAddress.String()))
+			connection.Write([]byte(remoteAddress.String()))
 		}
 
 		if err := connection.Close(); err != nil {

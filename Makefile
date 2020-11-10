@@ -1,4 +1,4 @@
-CONTAINER_TAG=us.icr.io/attila-fabian/proxy-protocol-debugger
+CONTAINER_TAG?=us.icr.io/attila-fabian/proxy-protocol-debugger
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags '-w' -o proxy-protocol-debugger -a .

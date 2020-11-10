@@ -30,7 +30,7 @@ func main() {
 			logger.Error("failed to establish new connection", zap.Error(err))
 			continue
 		} else {
-			logger.Info("successfully established new connection")
+			logger.Debug("successfully established new connection")
 		}
 
 		remoteAddress := connection.RemoteAddr()
@@ -44,6 +44,6 @@ func main() {
 			logger.Error("failed to close connection", zap.Error(err))
 			continue
 		}
-		logger.Info("successfully closed connection")
+		logger.Debug("successfully closed connection")
 	}
 }

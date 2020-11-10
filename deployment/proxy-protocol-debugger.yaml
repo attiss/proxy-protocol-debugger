@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: proxy-protocol-debugger
-          image: us.icr.io/attila-fabian/proxy-protocol-debugger:latest
+          image: attiss/proxy-protocol-debugger:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

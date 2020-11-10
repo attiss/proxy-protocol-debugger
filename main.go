@@ -1,37 +1,49 @@
 package main
 
 import (
-	"log"
 	"net"
 
 	proxyproto "github.com/pires/go-proxyproto"
+	"go.uber.org/zap"
+)
+
+const (
+	listenAddress = "0.0.0.0:8080"
 )
 
 func main() {
-	addr := ":8080"
-	list, err := net.Listen("tcp", addr)
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
+	listener, err := net.Listen("tcp", listenAddress)
 	if err != nil {
-		log.Fatalf("could not listen on %s: %q\n", addr, err.Error())
+		logger.Error("failed to create listener", zap.String("address", listenAddress), zap.Error(err))
+		panic(err)
 	}
 
-	proxyListener := &proxyproto.Listener{Listener: list}
+	proxyListener := &proxyproto.Listener{Listener: listener}
 	defer proxyListener.Close()
 
 	for {
-		conn, _ := proxyListener.Accept()
-
-		if conn.LocalAddr() == nil {
-			log.Fatal("could not retrieve local address")
+		connection, err := proxyListener.Accept()
+		if err != nil {
+			logger.Error("failed to establish new connection", zap.Error(err))
+			continue
+		} else {
+			logger.Info("successfully established new connection")
 		}
-		log.Printf("local address: %s", conn.LocalAddr().String())
 
-		if conn.RemoteAddr() == nil {
-			log.Fatal("could not retrieve remote address")
+		remoteAddress := connection.RemoteAddr()
+		if remoteAddress == nil {
+			logger.Error("failed to retrieve remote address")
+		} else {
+			logger.Info("successfully retrieved remote address", zap.String("remote", remoteAddress.String()))
 		}
-		log.Printf("remote address: %q", conn.RemoteAddr().String())
 
-		if err := conn.Close(); err != nil {
-			log.Fatalf("could not close connection: %s", err.Error())
+		if err := connection.Close(); err != nil {
+			logger.Error("failed to close connection", zap.Error(err))
+			continue
 		}
+		logger.Info("successfully closed connection")
 	}
 }
